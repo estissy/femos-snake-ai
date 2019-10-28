@@ -228,10 +228,8 @@ def test_get_full_game_representation_strategy():
     height = 8
     sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, number_of_snacks,
                        snake_length)
-    print(sample_game.snake)
 
     game_representation = Game.get_full_game_representation_strategy(sample_game)
-    print(game_representation)
     assert len(game_representation) == 8 * 8 + 4
     assert game_representation[36] == 1
     assert game_representation[44] == 1
