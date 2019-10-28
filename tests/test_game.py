@@ -214,3 +214,25 @@ def test_snake_moves():
     game_copy.move_forward(Direction.DOWN)
     assert game_copy.snake == correct_snake_blocks
     assert len(game_copy.snake) == snake_length
+
+
+def test_get_full_game_representation_strategy():
+    sample_phenotype = Phenotype
+
+    def game_representation_strategy(game):
+        return Game.get_full_game_representation_strategy(game)
+
+    snake_length = 3
+    number_of_snacks = 3
+    width = 8
+    height = 8
+    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, number_of_snacks,
+                       snake_length)
+    print(sample_game.snake)
+
+    game_representation = Game.get_full_game_representation_strategy(sample_game)
+    print(game_representation)
+    assert len(game_representation) == 8 * 8 + 4
+    assert game_representation[36] == 1
+    assert game_representation[44] == 1
+    assert game_representation[52] == 1
