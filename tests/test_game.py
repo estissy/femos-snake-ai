@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from femos.phenotypes import Phenotype
 
-from src.game import Game, Direction
+from lib.game import Game, Direction
 
 
 def test_game_initialization():
