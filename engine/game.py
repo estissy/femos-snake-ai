@@ -37,6 +37,7 @@ class Game:
         self.seed = seed
         self.number_of_snacks = number_of_snacks
         self.game_representation_strategy = game_representation_strategy
+        self.snack_perspective = None
 
         self.status = GameStatus.INITIALIZED
         self.snacks = []
@@ -53,6 +54,8 @@ class Game:
 
         for index in range(snake_length):
             self.snake.append((middle_x + index, middle_y))
+
+        self.snack_perspective = (middle_x + snake_length, middle_y)
 
     def initialize_snacks(self):
         x_range = range(self.width)
@@ -74,6 +77,7 @@ class Game:
 
         new_head_position = None
         new_tail = self.snake[:-1]
+        new_snack_perspective_position = self.snake[-1]
 
         # Handle inadequate move. As result snake is moving in the same direction.
         if self.direction == Direction.LEFT and (new_direction == Direction.LEFT or new_direction == Direction.RIGHT):
@@ -102,6 +106,7 @@ class Game:
             new_head_position = (head_position[0] + 1, head_position[1])
 
         self.snake = [new_head_position] + new_tail
+        self.snack_perspective = new_snack_perspective_position
 
     @staticmethod
     def get_full_game_representation_strategy(game):
@@ -212,6 +217,8 @@ class Game:
             game.score += 1
             game.snacks.remove(snake_head_position)
             game.initialize_snacks()
+
+            game.snake.append(game.snack_perspective)
 
         # Make decision
         game_state_representation = game.game_representation_strategy(game)

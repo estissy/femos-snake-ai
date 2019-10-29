@@ -23,6 +23,7 @@ def test_game_initialization():
     correct_snake_blocks = [(16, 9), (17, 9), (18, 9), (19, 9), (20, 9)]
     assert sample_game.snake == correct_snake_blocks
     assert len(sample_game.snacks) == number_of_snacks
+    assert sample_game.snack_perspective == (21, 9)
 
     for selected_snack in sample_game.snacks:
         assert selected_snack not in correct_snake_blocks
