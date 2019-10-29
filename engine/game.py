@@ -142,7 +142,6 @@ class Game:
     @staticmethod
     def get_new_direction_from_prediction(prediction, current_direction):
         best_decision = argmax(prediction)
-        parsed_prediction = None
 
         if best_decision == 0:
             parsed_prediction = Prediction.ROTATE_RIGHT
@@ -230,13 +229,12 @@ class Game:
 
         # Update current direction
         game.direction = new_direction
-        snake_head_position = game.get_snake_head_position()
 
         return deepcopy(game)
 
-    def run(self):
+    def evaluate_phenotype(self):
 
-        while 1:
+        while self.status != GameStatus.ENDED:
             snake_head_position = self.get_snake_head_position()
 
             if self.is_snake_head_in_wall(snake_head_position):
