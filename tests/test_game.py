@@ -4,7 +4,7 @@ from femos.core import get_number_of_nn_weights
 from femos.genotypes import SimpleGenotype
 from femos.phenotypes import Phenotype
 
-from engine.game import Game, Direction
+from engine.game import Game, Direction, GameStatus
 
 
 def test_game_initialization():
@@ -297,3 +297,32 @@ def test_snake_points_assignment():
     assert next_game_object.snack is not None
     assert len(next_game_object.snake) == snake_length + 1
     assert next_game_object.snack_perspective is not None
+
+
+def test_game_max_points_threshold():
+    def game_representation_strategy(game):
+        return Game.get_full_game_representation_strategy(game)
+
+    snake_length = 5
+    width = 32
+    height = 18
+    snack_eaten_points = 2
+
+    input_nodes = width * height + 4
+    hidden_layer_nodes = [64]
+    output_nodes = 3
+    number_of_nn_weights = get_number_of_nn_weights(input_nodes, hidden_layer_nodes, output_nodes)
+    weight_lower_threshold = -1
+    weight_upper_threshold = 1
+    max_points_threshold = 200
+
+    sample_genotype = SimpleGenotype.get_random_genotype(number_of_nn_weights, weight_lower_threshold,
+                                                         weight_upper_threshold)
+    sample_phenotype = Phenotype(sample_genotype.weights, input_nodes, hidden_layer_nodes, output_nodes)
+
+    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length,
+                       snack_eaten_points, max_points_threshold=max_points_threshold)
+    sample_game.score = 200
+
+    next_game_state = Game.get_next_game(sample_game)
+    assert next_game_state.status == GameStatus.ENDED
