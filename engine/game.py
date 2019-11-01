@@ -30,13 +30,17 @@ class Prediction(Enum):
 class Game:
 
     def __init__(self, width, height, phenotype, seed, game_representation_strategy,
-                 snake_length=5):
+                 snake_length=5, snack_eaten_points=1, moved_toward_snack_points=0.1,
+                 moved_away_from_snack_points=-0.2):
         self.width = width
         self.height = height
         self.phenotype = phenotype
         self.seed = seed
         self.game_representation_strategy = game_representation_strategy
         self.snack_perspective = None
+        self.snack_eaten_points = snack_eaten_points
+        self.moved_toward_snack_points = moved_toward_snack_points
+        self.moved_away_from_snack_points = moved_away_from_snack_points
 
         self.status = GameStatus.INITIALIZED
         self.snack = None
@@ -218,19 +222,18 @@ class Game:
             return game
 
         # Handle snake eating snack points
+        new_snack_distance = Game.get_snake_snacks_distances(snake_head_position, game.snack)
         if game.is_snake_eating_snack(snake_head_position):
-            game.score += 1
+            game.score += game.snack_eaten_points
             game.initialize_snack()
 
             game.snake.append(game.snack_perspective)
-
-        # Handle snake approach nearest snack
-        new_snack_distance = Game.get_snake_snacks_distances(snake_head_position, game.snack)
-
-        if new_snack_distance < game.last_snack_distance:
-            game.score += 0.1
         else:
-            game.score -= 0.2
+            # Handle snake approach nearest snack
+            if new_snack_distance < game.last_snack_distance:
+                game.score += game.moved_toward_snack_points
+            else:
+                game.score += game.moved_away_from_snack_points
 
         game.last_snack_distance = new_snack_distance
 
