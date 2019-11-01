@@ -1,8 +1,8 @@
 from copy import deepcopy
 from enum import Enum
 from itertools import product
-from math import ceil
-from random import sample
+from math import ceil, sqrt, pow
+from random import choice
 
 from femos.phenotypes import Phenotype
 from numpy import argmax
@@ -29,24 +29,25 @@ class Prediction(Enum):
 
 class Game:
 
-    def __init__(self, width, height, phenotype, seed, game_representation_strategy, number_of_snacks=1,
+    def __init__(self, width, height, phenotype, seed, game_representation_strategy,
                  snake_length=5):
         self.width = width
         self.height = height
         self.phenotype = phenotype
         self.seed = seed
-        self.number_of_snacks = number_of_snacks
         self.game_representation_strategy = game_representation_strategy
         self.snack_perspective = None
 
         self.status = GameStatus.INITIALIZED
-        self.snacks = []
+        self.snack = None
         self.snake = []
         self.score = 0
         self.direction = Direction.LEFT
+        self.last_snack_distance = 0
 
         self.initialize_snake(snake_length)
-        self.initialize_snacks()
+        self.initialize_snack()
+        self.initialize_last_snack_distance()
 
     def initialize_snake(self, snake_length=5):
         middle_x = ceil(self.width / 2)
@@ -57,20 +58,27 @@ class Game:
 
         self.snack_perspective = (middle_x + snake_length, middle_y)
 
-    def initialize_snacks(self):
+    def initialize_snack(self):
         x_range = range(self.width)
         y_range = range(self.height)
 
         positions = product(x_range, y_range)
         available_positions = list(
-            filter(lambda position: position not in self.snake and position not in self.snacks, positions))
-        snacks_to_initialize = self.number_of_snacks - len(self.snacks)
-        new_random_snacks = sample(available_positions, snacks_to_initialize)
+            filter(lambda position: position not in self.snake, positions))
+        self.snack = choice(available_positions)
 
-        self.snacks += new_random_snacks
+    def initialize_last_snack_distance(self):
+        snake_head_position = self.get_snake_head_position()
+        self.last_snack_distance = self.get_snake_snacks_distances(snake_head_position, self.snack)
 
     def get_snake_head_position(self):
         return self.snake[0]
+
+    @staticmethod
+    def get_snake_snacks_distances(snake_head_position, snack_position):
+        coefficient1 = pow(snake_head_position[0] - snack_position[0], 2)
+        coefficient2 = pow(snake_head_position[1] - snack_position[1], 2)
+        return sqrt(coefficient1 + coefficient2)
 
     def move_forward(self, new_direction):
         head_position = self.get_snake_head_position()
@@ -122,7 +130,7 @@ class Game:
 
             if selected_position in game.snake:
                 game_representation.append(1)
-            elif selected_position in game.snacks:
+            elif selected_position == game.snack:
                 game_representation.append(-1)
             else:
                 game_representation.append(0)
@@ -199,10 +207,7 @@ class Game:
             return False
 
     def is_snake_eating_snack(self, snake_head_position):
-        if snake_head_position in self.snacks:
-            return True
-        else:
-            return False
+        return snake_head_position == self.snack
 
     @staticmethod
     def get_next_game(game):
@@ -212,12 +217,22 @@ class Game:
             game.status = GameStatus.ENDED
             return game
 
+        # Handle snake eating snack points
         if game.is_snake_eating_snack(snake_head_position):
             game.score += 1
-            game.snacks.remove(snake_head_position)
-            game.initialize_snacks()
+            game.initialize_snack()
 
             game.snake.append(game.snack_perspective)
+
+        # Handle snake approach nearest snack
+        new_snack_distance = Game.get_snake_snacks_distances(snake_head_position, game.snack)
+
+        if new_snack_distance < game.last_snack_distance:
+            game.score += 0.1
+        else:
+            game.score -= 0.2
+
+        game.last_snack_distance = new_snack_distance
 
         # Make decision
         game_state_representation = game.game_representation_strategy(game)
@@ -243,8 +258,7 @@ class Game:
 
             if self.is_snake_eating_snack(snake_head_position):
                 self.score += 1
-                self.snacks.remove(snake_head_position)
-                self.initialize_snacks()
+                self.initialize_snack()
 
             # Make decision
             game_state_representation = self.game_representation_strategy(self)

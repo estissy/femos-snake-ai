@@ -29,7 +29,7 @@ genotype = UncorrelatedNStepSizeGenotype.get_random_genotype(number_of_nn_weight
 phenotype = Phenotype.get_phenotype_from_genotype(genotype, input_nodes, hidden_layer_nodes, output_nodes)
 
 game = Game(game_board_width, game_board_height, phenotype, seed, Game.get_full_game_representation_strategy,
-            number_of_snacks, initial_snake_length)
+            initial_snake_length)
 
 pygame.init()
 

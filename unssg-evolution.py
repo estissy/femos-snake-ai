@@ -10,8 +10,7 @@ from engine.game import Game
 game_board_width = 36
 game_board_height = 18
 seed = 777
-number_of_snacks = 5
-initial_snake_length = 6
+initial_snake_length = 5
 
 input_nodes = game_board_width * game_board_height + 4
 hidden_layer_nodes = [64]
@@ -41,11 +40,11 @@ def evaluation_strategy(phenotypes):
 
     for selected_phenotype in phenotypes:
         game = Game(game_board_width, game_board_height, selected_phenotype, seed,
-                    Game.get_full_game_representation_strategy, number_of_snacks, initial_snake_length)
+                    Game.get_full_game_representation_strategy, initial_snake_length)
         game.evaluate_phenotype()
         phenotype_values.append(game.score)
 
-    print(mean(phenotype_values))
+    print(mean(phenotype_values), max(phenotype_values))
     return phenotype_values
 
 

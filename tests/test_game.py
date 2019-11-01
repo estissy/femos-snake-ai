@@ -12,23 +12,19 @@ def test_game_initialization():
         return Game.get_full_game_representation_strategy(game)
 
     snake_length = 5
-    number_of_snacks = 3
     width = 32
     height = 18
-    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, number_of_snacks,
-                       snake_length)
+    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length)
 
     assert len(sample_game.snake) == snake_length
 
     correct_snake_blocks = [(16, 9), (17, 9), (18, 9), (19, 9), (20, 9)]
     assert sample_game.snake == correct_snake_blocks
-    assert len(sample_game.snacks) == number_of_snacks
     assert sample_game.snack_perspective == (21, 9)
 
-    for selected_snack in sample_game.snacks:
-        assert selected_snack not in correct_snake_blocks
-        assert 0 <= selected_snack[0] <= width
-        assert 0 <= selected_snack[1] <= height
+    assert sample_game.snack not in correct_snake_blocks
+    assert 0 <= sample_game.snack[0] <= width
+    assert 0 <= sample_game.snack[1] <= height
 
 
 def test_snake_moves():
@@ -38,11 +34,9 @@ def test_snake_moves():
         return Game.get_full_game_representation_strategy(game)
 
     snake_length = 5
-    number_of_snacks = 3
     width = 32
     height = 18
-    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, number_of_snacks,
-                       snake_length)
+    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length)
 
     # Test snake going LEFT and changed to LEFT
     game_copy = deepcopy(sample_game)
@@ -224,11 +218,9 @@ def test_get_full_game_representation_strategy():
         return Game.get_full_game_representation_strategy(game)
 
     snake_length = 3
-    number_of_snacks = 3
     width = 8
     height = 8
-    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, number_of_snacks,
-                       snake_length)
+    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length)
 
     game_representation = Game.get_full_game_representation_strategy(sample_game)
     assert len(game_representation) == 8 * 8 + 4
