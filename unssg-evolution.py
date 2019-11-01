@@ -24,6 +24,9 @@ population_size = 20
 epochs = 1000
 tau1 = 0.001
 tau2 = 0.01
+snack_eaten_points = 1
+moving_toward_snack_points = 0.1
+moving_away_snack_points = -0.2
 
 genotypes = UncorrelatedNStepSizeGenotype.get_random_genotypes(population_size, number_of_nn_weights,
                                                                weight_lower_threshold, weight_upper_threshold,
@@ -39,10 +42,11 @@ def evaluation_strategy(phenotypes):
     phenotype_values = []
 
     for selected_phenotype in phenotypes:
-        game = Game(game_board_width, game_board_height, selected_phenotype, seed,
-                    Game.get_full_game_representation_strategy, initial_snake_length)
-        game.evaluate_phenotype()
-        phenotype_values.append(game.score)
+        initial_game = Game(game_board_width, game_board_height, selected_phenotype, seed,
+                            Game.get_full_game_representation_strategy, initial_snake_length, snack_eaten_points,
+                            moving_toward_snack_points, moving_away_snack_points)
+        solved_game = Game.get_solved_game(initial_game)
+        phenotype_values.append(solved_game.score)
 
     print(mean(phenotype_values), max(phenotype_values))
     return phenotype_values

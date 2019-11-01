@@ -250,26 +250,10 @@ class Game:
 
         return deepcopy(game)
 
-    def evaluate_phenotype(self):
+    @staticmethod
+    def get_solved_game(game):
+        tmp_game = game
+        while tmp_game.status != GameStatus.ENDED:
+            tmp_game = Game.get_next_game(tmp_game)
 
-        while self.status != GameStatus.ENDED:
-            snake_head_position = self.get_snake_head_position()
-
-            if self.is_snake_head_in_wall(snake_head_position):
-                self.status = GameStatus.ENDED
-                return self
-
-            if self.is_snake_eating_snack(snake_head_position):
-                self.score += 1
-                self.initialize_snack()
-
-            # Make decision
-            game_state_representation = self.game_representation_strategy(self)
-            prediction = Phenotype.get_prediction(self.phenotype, game_state_representation)
-            new_direction = self.get_new_direction_from_prediction(prediction, self.direction)
-
-            # Move forward
-            self.move_forward(new_direction)
-
-            # Update current direction
-            self.direction = new_direction
+        return tmp_game
