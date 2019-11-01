@@ -1,19 +1,31 @@
 from copy import deepcopy
 
+from femos.core import get_number_of_nn_weights
+from femos.genotypes import SimpleGenotype
 from femos.phenotypes import Phenotype
 
 from engine.game import Game, Direction
 
 
 def test_game_initialization():
-    sample_phenotype = Phenotype
-
     def game_representation_strategy(game):
         return Game.get_full_game_representation_strategy(game)
 
     snake_length = 5
     width = 32
     height = 18
+
+    input_nodes = width * height + 4
+    hidden_layer_nodes = [64]
+    output_nodes = 3
+    number_of_nn_weights = get_number_of_nn_weights(input_nodes, hidden_layer_nodes, output_nodes)
+    weight_lower_threshold = -1
+    weight_upper_threshold = 1
+
+    sample_genotype = SimpleGenotype.get_random_genotype(number_of_nn_weights, weight_lower_threshold,
+                                                         weight_upper_threshold)
+    sample_phenotype = Phenotype(sample_genotype.weights, input_nodes, hidden_layer_nodes, output_nodes)
+
     sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length)
 
     assert len(sample_game.snake) == snake_length
@@ -28,14 +40,23 @@ def test_game_initialization():
 
 
 def test_snake_moves():
-    sample_phenotype = Phenotype
-
     def game_representation_strategy(game):
         return Game.get_full_game_representation_strategy(game)
 
     snake_length = 5
     width = 32
     height = 18
+
+    input_nodes = width * height + 4
+    hidden_layer_nodes = [64]
+    output_nodes = 3
+    number_of_nn_weights = get_number_of_nn_weights(input_nodes, hidden_layer_nodes, output_nodes)
+    weight_lower_threshold = -1
+    weight_upper_threshold = 1
+
+    sample_genotype = SimpleGenotype.get_random_genotype(number_of_nn_weights, weight_lower_threshold,
+                                                         weight_upper_threshold)
+    sample_phenotype = Phenotype(sample_genotype.weights, input_nodes, hidden_layer_nodes, output_nodes)
     sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length)
 
     # Test snake going LEFT and changed to LEFT
@@ -212,14 +233,22 @@ def test_snake_moves():
 
 
 def test_get_full_game_representation_strategy():
-    sample_phenotype = Phenotype
-
     def game_representation_strategy(game):
         return Game.get_full_game_representation_strategy(game)
 
     snake_length = 3
     width = 8
     height = 8
+    input_nodes = width * height + 4
+    hidden_layer_nodes = [64]
+    output_nodes = 3
+    number_of_nn_weights = get_number_of_nn_weights(input_nodes, hidden_layer_nodes, output_nodes)
+    weight_lower_threshold = -1
+    weight_upper_threshold = 1
+
+    sample_genotype = SimpleGenotype.get_random_genotype(number_of_nn_weights, weight_lower_threshold,
+                                                         weight_upper_threshold)
+    sample_phenotype = Phenotype(sample_genotype.weights, input_nodes, hidden_layer_nodes, output_nodes)
     sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length)
 
     game_representation = Game.get_full_game_representation_strategy(sample_game)
@@ -227,3 +256,40 @@ def test_get_full_game_representation_strategy():
     assert game_representation[36] == 1
     assert game_representation[44] == 1
     assert game_representation[52] == 1
+
+
+def test_snake_points_assignment():
+    def game_representation_strategy(game):
+        return Game.get_full_game_representation_strategy(game)
+
+    snake_length = 5
+    width = 32
+    height = 18
+    snack_eaten_points = 2
+
+    input_nodes = width * height + 4
+    hidden_layer_nodes = [64]
+    output_nodes = 3
+    number_of_nn_weights = get_number_of_nn_weights(input_nodes, hidden_layer_nodes, output_nodes)
+    weight_lower_threshold = -1
+    weight_upper_threshold = 1
+
+    sample_genotype = SimpleGenotype.get_random_genotype(number_of_nn_weights, weight_lower_threshold,
+                                                         weight_upper_threshold)
+    sample_phenotype = Phenotype(sample_genotype.weights, input_nodes, hidden_layer_nodes, output_nodes)
+
+    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length,
+                       snack_eaten_points)
+
+    # Hack snack position
+    # Initial snake blocks are [(16, 9), (17, 9), (18, 9), (19, 9), (20, 9)]
+    # So we put snack on snake head
+    sample_game.snack = (16, 9)
+
+    next_game_object = Game.get_next_game(sample_game)
+
+    assert next_game_object.score == snack_eaten_points
+    assert next_game_object.snack != (16, 9)
+    assert next_game_object.snack is not None
+    assert len(next_game_object.snake) == snake_length + 1
+    assert next_game_object.snack_perspective is not None
