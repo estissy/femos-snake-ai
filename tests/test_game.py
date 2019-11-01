@@ -14,6 +14,7 @@ def test_game_initialization():
     snake_length = 5
     width = 32
     height = 18
+    seed = 777
 
     input_nodes = width * height + 4
     hidden_layer_nodes = [64]
@@ -26,7 +27,7 @@ def test_game_initialization():
                                                          weight_upper_threshold)
     sample_phenotype = Phenotype(sample_genotype.weights, input_nodes, hidden_layer_nodes, output_nodes)
 
-    sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length)
+    sample_game = Game(width, height, sample_phenotype, seed, game_representation_strategy, snake_length)
 
     assert len(sample_game.snake) == snake_length
 
@@ -37,6 +38,9 @@ def test_game_initialization():
     assert sample_game.snack not in correct_snake_blocks
     assert 0 <= sample_game.snack[0] <= width
     assert 0 <= sample_game.snack[1] <= height
+
+    another_game = Game(width, height, sample_phenotype, seed, game_representation_strategy, snake_length)
+    assert sample_game.snack == another_game.snack
 
 
 def test_snake_moves():

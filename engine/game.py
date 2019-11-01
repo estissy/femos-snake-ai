@@ -2,7 +2,7 @@ from copy import deepcopy
 from enum import Enum
 from itertools import product
 from math import ceil, sqrt, pow
-from random import choice
+from random import Random
 
 from femos.phenotypes import Phenotype
 from numpy import argmax
@@ -36,6 +36,7 @@ class Game:
         self.height = height
         self.phenotype = phenotype
         self.seed = seed
+        self.random_generator = Random(self.seed)
         self.game_representation_strategy = game_representation_strategy
         self.snack_perspective = None
         self.snack_eaten_points = snack_eaten_points
@@ -69,7 +70,7 @@ class Game:
         positions = product(x_range, y_range)
         available_positions = list(
             filter(lambda position: position not in self.snake, positions))
-        self.snack = choice(available_positions)
+        self.snack = self.random_generator.choice(available_positions)
 
     def initialize_last_snack_distance(self):
         snake_head_position = self.get_snake_head_position()
