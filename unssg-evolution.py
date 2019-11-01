@@ -4,7 +4,7 @@ from statistics import mean
 from femos.core import get_number_of_nn_weights, get_evolved_population
 from femos.genotypes import UncorrelatedNStepSizeGenotype
 from femos.phenotypes import Phenotype
-from femos.selections import get_two_size_tournament_parent_selection, get_age_based_offspring_selection
+from femos.selections import get_n_size_tournament_parent_selection, get_age_based_offspring_selection
 
 from engine.game import Game
 
@@ -24,6 +24,8 @@ parser.add_argument("--mutation_step_size_upper_threshold",
                     help="Upper threshold value for genotype mutation step size",
                     type=float, default=0.2)
 parser.add_argument("--population_size", help="Number of individuals in population", type=int, default=20)
+parser.add_argument("--tournament_size", help="Number of individuals to rival in tournament selection", type=int,
+                    default=3)
 parser.add_argument("--epochs", help="Number of epochs", type=int, default=1000)
 parser.add_argument("--tau1", help="Mutation operator parameter - tau1", type=float, default=0.001)
 parser.add_argument("--tau2", help="Mutation operator parameter - tau2", type=float, default=0.01)
@@ -69,7 +71,7 @@ def evaluation_strategy(phenotypes):
 
 
 def parent_selection_strategy(phenotypes_values):
-    return get_two_size_tournament_parent_selection(phenotypes_values, args.population_size)
+    return get_n_size_tournament_parent_selection(phenotypes_values, args.tournament_size, args.population_size)
 
 
 def mutation_strategy(genotype):
