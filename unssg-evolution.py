@@ -37,9 +37,11 @@ parser.add_argument("--moving_toward_snack_points", help="Number of points assig
                     type=float, default=0.1)
 parser.add_argument("--moving_away_snack_points", help="Number of points assigned when snake is moving away of snack",
                     type=float, default=-0.2)
-parser.add_argument("--max_points_threshold", help="Number of points to end game even if snake still plays.",
+parser.add_argument("--max_points_threshold", help="Maximum number of points to end game even if snake still plays.",
                     type=float,
                     default=10.0)
+parser.add_argument("--min_points_threshold", help="Minimum number of points to end game even if snake still plays.",
+                    default=-10.0)
 parser.add_argument("--same_environment", help="Use the same environment for every individual in population",
                     action="store_true")
 
@@ -77,9 +79,10 @@ def evaluation_strategy(phenotypes):
     moving_toward_snack_points = [args.moving_toward_snack_points] * args.population_size
     moving_away_snack_points = [args.moving_away_snack_points] * args.population_size
     max_points_thresholds = [args.max_points_threshold] * args.population_size
+    min_points_thresholds = [args.min_points_threshold] * args.population_size
     arguments = list(zip(game_board_widths, game_board_heights, phenotypes, seeds, game_representation_strategies,
                          initial_snake_lengths, snack_eaten_points, moving_toward_snack_points,
-                         moving_away_snack_points, max_points_thresholds))
+                         moving_away_snack_points, max_points_thresholds, min_points_thresholds))
 
     initialized_games = list(map(lambda game_arguments: Game(*game_arguments), arguments))
 

@@ -31,7 +31,7 @@ class Game:
 
     def __init__(self, width, height, phenotype, seed, game_representation_strategy,
                  snake_length=5, snack_eaten_points=1, moved_toward_snack_points=0.1,
-                 moved_away_from_snack_points=-0.2, max_points_threshold=200):
+                 moved_away_from_snack_points=-0.2, max_points_threshold=200, min_points_threshold=-10):
         self.width = width
         self.height = height
         self.phenotype = phenotype
@@ -43,6 +43,7 @@ class Game:
         self.moved_toward_snack_points = moved_toward_snack_points
         self.moved_away_from_snack_points = moved_away_from_snack_points
         self.max_points_threshold = max_points_threshold
+        self.min_points_threshold = min_points_threshold
 
         self.status = GameStatus.INITIALIZED
         self.snack = None
@@ -219,7 +220,7 @@ class Game:
     def get_next_game(game):
         snake_head_position = game.get_snake_head_position()
 
-        if game.score >= game.max_points_threshold:
+        if game.score >= game.max_points_threshold or game.score <= game.min_points_threshold:
             game.status = GameStatus.ENDED
             return game
 

@@ -315,14 +315,20 @@ def test_game_max_points_threshold():
     weight_lower_threshold = -1
     weight_upper_threshold = 1
     max_points_threshold = 200
+    min_points_threshold = -10
 
     sample_genotype = SimpleGenotype.get_random_genotype(number_of_nn_weights, weight_lower_threshold,
                                                          weight_upper_threshold)
     sample_phenotype = Phenotype(sample_genotype.weights, input_nodes, hidden_layer_nodes, output_nodes)
 
     sample_game = Game(width, height, sample_phenotype, 777, game_representation_strategy, snake_length,
-                       snack_eaten_points, max_points_threshold=max_points_threshold)
+                       snack_eaten_points, max_points_threshold=max_points_threshold,
+                       min_points_threshold=min_points_threshold)
     sample_game.score = 200
 
     next_game_state = Game.get_next_game(sample_game)
+    assert next_game_state.status == GameStatus.ENDED
+
+    next_game_state.score = -10
+    next_game_state = Game.get_next_game(next_game_state)
     assert next_game_state.status == GameStatus.ENDED
