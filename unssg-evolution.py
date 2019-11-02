@@ -1,4 +1,5 @@
 import argparse
+from multiprocessing import Pool
 from random import Random
 from statistics import mean
 
@@ -61,26 +62,31 @@ def phenotype_strategy(genotype):
 
 
 def evaluation_strategy(phenotypes):
-    phenotype_values = []
-    evaluation_seed = random_generator.randint(1, 100000)
+    game_board_widths = [args.game_board_width] * args.population_size
+    game_board_heights = [args.game_board_height] * args.population_size
 
-    for selected_phenotype in phenotypes:
-        if args.same_environment:
-            initial_game = Game(args.game_board_width, args.game_board_height, selected_phenotype, evaluation_seed,
-                                Game.get_full_game_representation_strategy, args.initial_snake_length,
-                                args.snack_eaten_points,
-                                args.moving_toward_snack_points, args.moving_away_snack_points,
-                                args.max_points_threshold)
-        else:
-            initial_game = Game(args.game_board_width, args.game_board_height, selected_phenotype,
-                                random_generator.randint(1, 100000),
-                                Game.get_full_game_representation_strategy, args.initial_snake_length,
-                                args.snack_eaten_points,
-                                args.moving_toward_snack_points, args.moving_away_snack_points,
-                                args.max_points_threshold)
+    if args.same_environment:
+        evaluation_random_seed = random_generator.randint(1, 1000000)
+        seeds = [evaluation_random_seed] * args.population_size
+    else:
+        seeds = list(map(lambda index: random_generator.randint(1, 1000000), range(args.population_size)))
 
-        solved_game = Game.get_solved_game(initial_game)
-        phenotype_values.append(solved_game.score)
+    game_representation_strategies = [Game.get_full_game_representation_strategy] * args.population_size
+    initial_snake_lengths = [args.initial_snake_length] * args.population_size
+    snack_eaten_points = [args.snack_eaten_points] * args.population_size
+    moving_toward_snack_points = [args.moving_toward_snack_points] * args.population_size
+    moving_away_snack_points = [args.moving_away_snack_points] * args.population_size
+    max_points_thresholds = [args.max_points_threshold] * args.population_size
+    arguments = list(zip(game_board_widths, game_board_heights, phenotypes, seeds, game_representation_strategies,
+                         initial_snake_lengths, snack_eaten_points, moving_toward_snack_points,
+                         moving_away_snack_points, max_points_thresholds))
+
+    initialized_games = list(map(lambda game_arguments: Game(*game_arguments), arguments))
+
+    with Pool() as p:
+        solved_games = p.map(Game.get_solved_game, initialized_games)
+
+    phenotype_values = list(map(lambda solved_game: solved_game.score, solved_games))
 
     print(mean(phenotype_values), max(phenotype_values))
     return phenotype_values
