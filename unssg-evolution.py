@@ -1,4 +1,5 @@
 import argparse
+from random import Random
 from statistics import mean
 
 from femos.core import get_number_of_nn_weights, get_evolved_population
@@ -38,6 +39,8 @@ parser.add_argument("--moving_away_snack_points", help="Number of points assigne
 parser.add_argument("--max_points_threshold", help="Number of points to end game even if snake still plays.",
                     type=float,
                     default=10.0)
+parser.add_argument("--same_environment", help="Use the same environment for every individual in population",
+                    action="store_true")
 
 args = parser.parse_args()
 
@@ -50,6 +53,8 @@ genotypes = UncorrelatedNStepSizeGenotype.get_random_genotypes(args.population_s
                                                                args.mutation_step_size_lower_threshold,
                                                                args.mutation_step_size_upper_threshold)
 
+random_generator = Random(args.seed)
+
 
 def phenotype_strategy(genotype):
     return Phenotype(genotype.weights, input_nodes, args.hidden_layer_nodes, output_nodes)
@@ -57,12 +62,23 @@ def phenotype_strategy(genotype):
 
 def evaluation_strategy(phenotypes):
     phenotype_values = []
+    evaluation_seed = random_generator.randint(1, 100000)
 
     for selected_phenotype in phenotypes:
-        initial_game = Game(args.game_board_width, args.game_board_height, selected_phenotype, args.seed,
-                            Game.get_full_game_representation_strategy, args.initial_snake_length,
-                            args.snack_eaten_points,
-                            args.moving_toward_snack_points, args.moving_away_snack_points, args.max_points_threshold)
+        if args.same_environment:
+            initial_game = Game(args.game_board_width, args.game_board_height, selected_phenotype, evaluation_seed,
+                                Game.get_full_game_representation_strategy, args.initial_snake_length,
+                                args.snack_eaten_points,
+                                args.moving_toward_snack_points, args.moving_away_snack_points,
+                                args.max_points_threshold)
+        else:
+            initial_game = Game(args.game_board_width, args.game_board_height, selected_phenotype,
+                                random_generator.randint(1, 100000),
+                                Game.get_full_game_representation_strategy, args.initial_snake_length,
+                                args.snack_eaten_points,
+                                args.moving_toward_snack_points, args.moving_away_snack_points,
+                                args.max_points_threshold)
+
         solved_game = Game.get_solved_game(initial_game)
         phenotype_values.append(solved_game.score)
 
