@@ -16,7 +16,7 @@ parser.add_argument("--game_board_width", help="Width of the snake game board.",
 parser.add_argument("--game_board_height", help="Height of the snake game board.", type=int, default=18)
 parser.add_argument("--seed", help="Selected integer value for experiments recurrence.", type=int, default=777)
 parser.add_argument("--initial_snake_length", help="Initial snake length in new game.", type=int, default=5)
-parser.add_argument("--hidden_layer_nodes", help="List of nodes in hidden layers", type=list, default=[64])
+parser.add_argument("--hidden_layer_nodes", help="List of nodes in hidden layers", type=int, default=[64], nargs="+")
 parser.add_argument("--weight_lower_threshold", help="Lower threshold value of ann weights", type=float, default=-1.0)
 parser.add_argument("--weight_upper_threshold", help="Upper threshold value of ann weights", type=float, default=1.0)
 parser.add_argument("--mutation_step_size_lower_threshold",
