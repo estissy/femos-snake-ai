@@ -155,6 +155,43 @@ class Game:
         return game_representation
 
     @staticmethod
+    def get_feature_based_game_representation_strategy(game):
+        snake_head_position = game.get_snake_head_position()
+        snack_position = game.snack
+
+        snack_position = [0] * 4
+        # Snack is on left side of the game board
+        if snack_position[0] < snake_head_position[0]:
+            snack_position[0] = 1
+
+        # Snack is on right side of the game board
+        elif snack_position[0] > snake_head_position[0]:
+            snack_position[1] = 1
+
+        # Snack is on top side of the game board
+        elif snack_position[1] < snake_head_position[1]:
+            snack_position[2] = 1
+
+        # Snack is on bottom side of the game board
+        elif snack_position[1] > snake_head_position[1]:
+            snack_position[3] = 1
+
+        # Encode collision with walls
+
+        # Encode current direction
+        current_direction = []
+        if game.direction == Direction.LEFT:
+            current_direction = [1, 0, 0, 0]
+        elif game.direction == Direction.RIGHT:
+            current_direction = [0, 1, 0, 0]
+        elif game.direction == Direction.UP:
+            current_direction = [0, 0, 1, 0]
+        else:
+            current_direction = [0, 0, 0, 1]
+
+        return snack_position + current_direction
+
+    @staticmethod
     def get_new_direction_from_prediction(prediction, current_direction):
         best_decision = argmax(prediction)
 
