@@ -7,13 +7,12 @@ from femos.phenotypes import Phenotype
 
 from engine.game import Game
 
-game_board_width = 36
-game_board_height = 18
+game_board_width = 6
+game_board_height = 6
 seed = 777
-number_of_snacks = 5
-initial_snake_length = 6
+initial_snake_length = 3
 
-input_nodes = game_board_width * game_board_height + 4
+input_nodes = 8
 hidden_layer_nodes = [64]
 output_nodes = 3
 number_of_nn_weights = get_number_of_nn_weights(input_nodes, hidden_layer_nodes, output_nodes)
@@ -61,12 +60,11 @@ while 1:
         top_y = selected_snake_block[1] * scale
         screen.blit(snake_block, (top_x, top_y))
 
-    for selected_snack_block in game.snacks:
-        snack_block = pygame.Surface((1 * scale, 1 * scale))
-        snack_block.fill(snack_color)
-        top_x = selected_snack_block[0] * scale
-        top_y = selected_snack_block[1] * scale
-        screen.blit(snack_block, (top_x, top_y))
+    snack_block = pygame.Surface((1 * scale, 1 * scale))
+    snack_block.fill(snack_color)
+    top_x = game.snack[0] * scale
+    top_y = game.snack[1] * scale
+    screen.blit(snack_block, (top_x, top_y))
 
     pygame.display.update()
     pygame.time.wait(delay)
