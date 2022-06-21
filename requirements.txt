@@ -4,7 +4,7 @@ femos==0.0.12
 humanize==0.5.1
 importlib-metadata==0.23
 more-itertools==7.2.0
-numpy==1.17.3
+numpy==1.22.0
 packaging==19.2
 pluggy==0.13.0
 py==1.8.0
